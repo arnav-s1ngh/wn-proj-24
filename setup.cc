@@ -66,14 +66,22 @@ int main(int argc, char* argv[]) {
    Ipv4InterfaceContainer sta_interfaces = address.Assign(sta_devices);
    
    
-   for(int cl_num=0;cl_num<nw;cl_num++){
-      std::cout<<"Running Client "<<cl_num+1<<std::endl;
-      BulkSendHelper source ("ns3::TcpSocketFactory", InetSocketAddress (sta_interfaces.GetAddress (cl_num), 9+cl_num));
-      source.SetAttribute ("MaxBytes", UintegerValue(5*1024*1024));
-      ApplicationContainer sourceApps = source.Install (ap_node.Get (0));
-      sourceApps.Start (Seconds (0.0));
-      sourceApps.Stop (Seconds (50.0));
-   }
+for (int cl_num = 0; cl_num < nw; cl_num++) {
+    std::cout << "Running Client " << cl_num + 1 << std::endl;
+    BulkSendHelper source("ns3::TcpSocketFactory", InetSocketAddress(ap_interface.GetAddress(0), 9 + cl_num));
+    source.SetAttribute("MaxBytes", UintegerValue(5 * 1024 * 1024));
+    ApplicationContainer sourceApps = source.Install(sta_nodes.Get(cl_num)); 
+    sourceApps.Start(Seconds(0.0));
+    sourceApps.Stop(Seconds(50.0));
+}
+
+for (int cl_num = 0; cl_num < nw; cl_num++) {
+    PacketSinkHelper sink("ns3::TcpSocketFactory", InetSocketAddress(Ipv4Address::GetAny(), 9 + cl_num));
+    ApplicationContainer sinkApps = sink.Install(ap_node.Get(0)); 
+    sinkApps.Start(Seconds(0.0));
+    sinkApps.Stop(Seconds(50.0));
+}
+
    
    
    Ipv4GlobalRoutingHelper::PopulateRoutingTables(); 
