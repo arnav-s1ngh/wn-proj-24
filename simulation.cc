@@ -1,7 +1,13 @@
 // Network topology
 //                           WiFi
+//                            AP
 //       n2<------------------n0------------------>n1
-//             3GPPHTTP             BulkSend       
+//             3GPPHTTP        |      BulkSend       
+//                             |
+//                             | BulkSend+3GPPHTTP
+//                             |
+//                             n3
+//
 //
 //   Flow from n0 to n1 using BulkSendApplication and ThreeGppHttpClientHelper
 //    A Fair bit of code has been borrowed from https://www.nsnam.org/doxygen/dc/d86/three-gpp-http-example_8cc_source.html
