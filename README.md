@@ -2,7 +2,7 @@
 The Project for CSE5235: Wireless Networks, as taught by Mukulika Maity at IIIT Delhi in Monsoon 2024
 
 
-Network Environment/Generate Traffic/Simulate Congestion  -> NS3 ✔️
+Network Environment/Generate Traffic -> NS3 ✔️
 
 Automating Web Browsing -> ThreeGppHttp ✔️
 
