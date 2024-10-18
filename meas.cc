@@ -1,13 +1,6 @@
-#include <fstream>  // Required for file handling
-
-// Open or create a CSV file
 std::ofstream csvFile;
 csvFile.open("flow_stats.csv", std::ios::out | std::ios::app);  // Open file in append mode
 
-// Write header (optional, but only do it once if necessary)
-csvFile << "FlowId,TxPackets,RxPackets,Throughput(Mbps),MeanDelay(s),PacketLoss(%)\n";
-
-// Iterate through flow statistics and store values
 fm->CheckForLostPackets(); 
 Ptr<Ipv4FlowClassifier> c = DynamicCast<Ipv4FlowClassifier>(fh.GetClassifier()); 
 std::map<FlowId, FlowMonitor::FlowStats> s = fm->GetFlowStats(); 
@@ -20,15 +13,12 @@ for (std::map<FlowId, FlowMonitor::FlowStats>::const_iterator i = s.begin(); i !
     double meanDelay = i->second.delaySum.GetSeconds() / i->second.rxPackets;  // Mean delay in seconds
     double packetLoss = (i->second.txPackets - i->second.rxPackets) * 100.0 / i->second.txPackets;  // Packet loss percentage
     
-    // Write the collected data into the CSV file
-    csvFile << flowId << "," 
+    csvFile << tcp_variant<<","<<flowId << "," 
             << txPackets << "," 
             << rxPackets << "," 
             << throughput << "," 
             << meanDelay << "," 
             << packetLoss << "\n";
 }
-
-// Close the file after writing
 csvFile.close();
 
