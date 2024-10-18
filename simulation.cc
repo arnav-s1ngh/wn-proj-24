@@ -124,7 +124,7 @@ int main(int argc, char* argv[]){
     LogComponentEnable("Project_Mid_Review", LOG_INFO);
     
     NodeContainer nodes;
-    nodes.Create(3);
+    nodes.Create(4);
 
     WifiHelper wifi;
     wifi.SetStandard(WIFI_STANDARD_80211g); 
@@ -146,8 +146,7 @@ int main(int argc, char* argv[]){
                     "Ssid", SsidValue(ssid));
     NetDeviceContainer staDevice = wifi.Install(phy, mac, nodes.Get(1));
     NetDeviceContainer staDevice2 = wifi.Install(phy, mac, nodes.Get(2));
-
-    // Combine devices
+    NetDeviceContainer staDevice3 = wifi.Install(phy, mac, nodes.Get(3));
 
     // Configure mobility
     MobilityHelper mobility;
@@ -173,6 +172,7 @@ int main(int argc, char* argv[]){
     Ipv4InterfaceContainer ap_interface = ipv4.Assign(apDevice);
     Ipv4InterfaceContainer sta_interface = ipv4.Assign(staDevice);
     Ipv4InterfaceContainer sta_interface2 = ipv4.Assign(staDevice2);
+    Ipv4InterfaceContainer sta_interface3 = ipv4.Assign(staDevice3);
 
     // Create applications
     uint16_t tcp_port = 9;
@@ -189,6 +189,17 @@ int main(int argc, char* argv[]){
     ApplicationContainer sinkApps = sink.Install(nodes.Get(1));
     sinkApps.Start(Seconds(0.0));
     sinkApps.Stop(Seconds(10.0));
+    
+    BulkSendHelper source2("ns3::TcpSocketFactory", InetSocketAddress(sta_interface3.GetAddress(0), tcp_port+1));
+    source2.SetAttribute("MaxBytes", UintegerValue(maxBytes));
+    ApplicationContainer sourceApps2 = source2.Install(nodes.Get(0));
+    sourceApps2.Start(Seconds(0.0));
+    sourceApps2.Stop(Seconds(10.0));
+
+    PacketSinkHelper sink2("ns3::TcpSocketFactory", InetSocketAddress(Ipv4Address::GetAny(), tcp_port));
+    ApplicationContainer sinkApps2 = sink2.Install(nodes.Get(3));
+    sinkApps2.Start(Seconds(0.0));
+    sinkApps2.Stop(Seconds(10.0));
     
     //3GPPHTTP
     ThreeGppHttpServerHelper serverHelper(ap_interface.GetAddress(0));
@@ -222,6 +233,40 @@ int main(int argc, char* argv[]){
  
     
     clientApps.Stop(Seconds(10.0));
+    
+    
+    //3GPPHTTP V2
+    ThreeGppHttpServerHelper serverHelper2(ap_interface.GetAddress(0));
+    ApplicationContainer serverApps2 = serverHelper2.Install(nodes.Get(0));
+    Ptr<ThreeGppHttpServer> httpServer2 = serverApps2.Get(0)->GetObject<ThreeGppHttpServer>();
+
+    httpServer2->TraceConnectWithoutContext("ConnectionEstablished",
+                                           MakeCallback(&ServerConnectionEstablished));
+    httpServer2->TraceConnectWithoutContext("MainObject", MakeCallback(&MainObjectGenerated));
+    httpServer2->TraceConnectWithoutContext("EmbeddedObject",
+                                           MakeCallback(&EmbeddedObjectGenerated));
+    httpServer2->TraceConnectWithoutContext("Tx", MakeCallback(&ServerTx));
+
+    // Configure server variables
+    PointerValue varPtr2;
+    httpServer2->GetAttribute("Variables", varPtr2);
+    Ptr<ThreeGppHttpVariables> httpVariables2 = varPtr2.Get<ThreeGppHttpVariables>();
+    httpVariables2->SetMainObjectSizeMean(102400);  // 100kB
+    httpVariables2->SetMainObjectSizeStdDev(40960); // 40kB
+    
+    // Setup HTTP client
+    ThreeGppHttpClientHelper clientHelper2(ap_interface.GetAddress(0));
+    ApplicationContainer clientApps2 = clientHelper2.Install(nodes.Get(2));
+    Ptr<ThreeGppHttpClient> httpClient2 = clientApps2.Get(0)->GetObject<ThreeGppHttpClient>();
+
+    httpClient2->TraceConnectWithoutContext("RxMainObject", MakeCallback(&ClientMainObjectReceived));
+    httpClient2->TraceConnectWithoutContext("RxEmbeddedObject",
+                                           MakeCallback(&ClientEmbeddedObjectReceived));
+    httpClient2->TraceConnectWithoutContext("Rx", MakeCallback(&ClientRx));
+    httpClient2->TraceConnectWithoutContext("RxPage", MakeCallback(&ClientPageReceived));
+ 
+    
+    clientApps2.Stop(Seconds(10.0));
 
     AsciiTraceHelper ascii;
     phy.EnableAsciiAll(ascii.CreateFileStream("fuck.tr"));
