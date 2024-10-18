@@ -218,7 +218,7 @@ int main(int argc, char* argv[]){
     PointerValue varPtr;
     httpServer->GetAttribute("Variables", varPtr);
     Ptr<ThreeGppHttpVariables> httpVariables = varPtr.Get<ThreeGppHttpVariables>();
-    httpVariables->SetMainObjectSizeMean(102400);  // 100kB
+    httpVariables->SetMainObjectSizeMean(10240000);  // ~10MB
     httpVariables->SetMainObjectSizeStdDev(40960); // 40kB
     
     // Setup HTTP client
@@ -252,7 +252,7 @@ int main(int argc, char* argv[]){
     PointerValue varPtr2;
     httpServer2->GetAttribute("Variables", varPtr2);
     Ptr<ThreeGppHttpVariables> httpVariables2 = varPtr2.Get<ThreeGppHttpVariables>();
-    httpVariables2->SetMainObjectSizeMean(102400);  // 100kB
+    httpVariables2->SetMainObjectSizeMean(10240000);  // 10Mb
     httpVariables2->SetMainObjectSizeStdDev(40960); // 40kB
     
     // Setup HTTP client
