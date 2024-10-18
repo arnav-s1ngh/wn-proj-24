@@ -115,7 +115,7 @@ int main(int argc, char* argv[]){
     // LogComponentEnableAll (LOG_PREFIX_FUNC);
     // LogComponentEnable ("ThreeGppHttpClient", LOG_INFO);
     /// LogComponentEnable ("ThreeGppHttpServer", LOG_INFO);
-    LogComponentEnable("ThreeGppHttpExample", LOG_INFO);
+    LogComponentEnable("Project_Mid_Review", LOG_INFO);
     
     NodeContainer nodes;
     nodes.Create(3);
