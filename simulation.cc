@@ -19,8 +19,104 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE("Project_Mid_Review");
 
+void
+
+ServerConnectionEstablished(Ptr<const ThreeGppHttpServer>, Ptr<Socket>)
+{
+    NS_LOG_INFO("Client has established a connection to the server.");
+}
+
+void
+
+MainObjectGenerated(uint32_t size)
+{
+    NS_LOG_INFO("Server generated a main object of " << size << " bytes.");
+}
+
+void
+
+EmbeddedObjectGenerated(uint32_t size)
+{
+    NS_LOG_INFO("Server generated an embedded object of " << size << " bytes.");
+}
+
+void
+
+ServerTx(Ptr<const Packet> packet)
+{
+    NS_LOG_INFO("Server sent a packet of " << packet->GetSize() << " bytes.");
+}
+
+void
+
+ClientRx(Ptr<const Packet> packet, const Address& address)
+{
+    NS_LOG_INFO("Client received a packet of " << packet->GetSize() << " bytes from " << address);
+}
+
+void
+
+ClientMainObjectReceived(Ptr<const ThreeGppHttpClient>, Ptr<const Packet> packet)
+{
+    Ptr<Packet> p = packet->Copy();
+    ThreeGppHttpHeader header;
+    p->RemoveHeader(header);
+    if (header.GetContentLength() == p->GetSize() &&
+        header.GetContentType() == ThreeGppHttpHeader::MAIN_OBJECT)
+    {
+        NS_LOG_INFO("Client has successfully received a main object of " << p->GetSize()
+                                                                         << " bytes.");
+    }
+    else
+    {
+        NS_LOG_INFO("Client failed to parse a main object. ");
+    }
+}
+
+void
+
+ClientEmbeddedObjectReceived(Ptr<const ThreeGppHttpClient>, Ptr<const Packet> packet)
+{
+    Ptr<Packet> p = packet->Copy();
+    ThreeGppHttpHeader header;
+    p->RemoveHeader(header);
+    if (header.GetContentLength() == p->GetSize() &&
+        header.GetContentType() == ThreeGppHttpHeader::EMBEDDED_OBJECT)
+    {
+        NS_LOG_INFO("Client has successfully received an embedded object of " << p->GetSize()
+                                                                              << " bytes.");
+    }
+    else
+    {
+        NS_LOG_INFO("Client failed to parse an embedded object. ");
+    }
+}
+
+void
+
+ClientPageReceived(Ptr<const ThreeGppHttpClient> client,
+                   const Time& time,
+                   uint32_t numObjects,
+                   uint32_t numBytes)
+{
+    NS_LOG_INFO("Client " << client << " has received a page that took " << time.As(Time::MS)
+                          << " ms to load with " << numObjects << " objects and " << numBytes
+                          << " bytes.");
+}
+
+
 int main(int argc, char* argv[]){
     uint32_t maxBytes = 1000*1000*5;
+
+
+
+    Time::SetResolution(Time::NS);
+    LogComponentEnableAll(LOG_PREFIX_TIME);
+    // LogComponentEnableAll (LOG_PREFIX_FUNC);
+    // LogComponentEnable ("ThreeGppHttpClient", LOG_INFO);
+    /// LogComponentEnable ("ThreeGppHttpServer", LOG_INFO);
+    LogComponentEnable("ThreeGppHttpExample", LOG_INFO);
+    
     NodeContainer nodes;
     nodes.Create(3);
 
@@ -89,9 +185,16 @@ int main(int argc, char* argv[]){
     sinkApps.Stop(Seconds(10.0));
     
     //3GPPHTTP
-    ThreeGppHttpServerHelper serverHelper(sta_interface2.GetAddress(0));
+    ThreeGppHttpServerHelper serverHelper(ap_interface.GetAddress(0));
     ApplicationContainer serverApps = serverHelper.Install(nodes.Get(0));
     Ptr<ThreeGppHttpServer> httpServer = serverApps.Get(0)->GetObject<ThreeGppHttpServer>();
+
+    httpServer->TraceConnectWithoutContext("ConnectionEstablished",
+                                           MakeCallback(&ServerConnectionEstablished));
+    httpServer->TraceConnectWithoutContext("MainObject", MakeCallback(&MainObjectGenerated));
+    httpServer->TraceConnectWithoutContext("EmbeddedObject",
+                                           MakeCallback(&EmbeddedObjectGenerated));
+    httpServer->TraceConnectWithoutContext("Tx", MakeCallback(&ServerTx));
 
     // Configure server variables
     PointerValue varPtr;
@@ -104,6 +207,13 @@ int main(int argc, char* argv[]){
     ThreeGppHttpClientHelper clientHelper(ap_interface.GetAddress(0));
     ApplicationContainer clientApps = clientHelper.Install(nodes.Get(2));
     Ptr<ThreeGppHttpClient> httpClient = clientApps.Get(0)->GetObject<ThreeGppHttpClient>();
+
+    httpClient->TraceConnectWithoutContext("RxMainObject", MakeCallback(&ClientMainObjectReceived));
+    httpClient->TraceConnectWithoutContext("RxEmbeddedObject",
+                                           MakeCallback(&ClientEmbeddedObjectReceived));
+    httpClient->TraceConnectWithoutContext("Rx", MakeCallback(&ClientRx));
+    httpClient->TraceConnectWithoutContext("RxPage", MakeCallback(&ClientPageReceived));
+ 
     
     clientApps.Stop(Seconds(10.0));
 
