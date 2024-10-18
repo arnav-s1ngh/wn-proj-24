@@ -6,6 +6,7 @@
 //                             |
 //                             | BulkSend+3GPPHTTP
 //                             |
+//                             v
 //                             n3
 //
 //
