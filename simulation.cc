@@ -1,10 +1,10 @@
 // Network topology
-//
-//       n0------------------>n1
-//         WiFi
+//                           WiFi
+//       n2<------------------n0------------------>n1
+//             3GPPHTTP             BulkSend       
 //
 //   Flow from n0 to n1 using BulkSendApplication and ThreeGppHttpClientHelper
-
+//    A Fair bit of code has been borrowed from https://www.nsnam.org/doxygen/dc/d86/three-gpp-http-example_8cc_source.html
 #include "ns3/applications-module.h"
 #include "ns3/core-module.h"
 #include "ns3/internet-module.h"
