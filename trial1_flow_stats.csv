@@ -1,4 +1,4 @@
-tcp_variant,txpackets,rxpackets,throughput,meandelay,packetloss
+tcp_variant,flow_id,txpackets,rxpackets,throughput,meandelay,packetloss
 ns3::TcpIllinois,1,5546,5342,2.44753,0.332187,3.67833
 ns3::TcpIllinois,2,3,3,0.0001344,0.581599,0
 ns3::TcpIllinois,3,351,350,0.0163856,0.0035477,0.2849
