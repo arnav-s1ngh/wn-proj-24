@@ -11,4 +11,4 @@ File Transfer -> BulkSend ✔️
 
 Select and Implement Diff. Congestion Control Algos ✔️
 
-Time Series Analysis
+Time Series Analysis ✔️
