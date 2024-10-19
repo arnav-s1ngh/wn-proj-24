@@ -1,4 +1,4 @@
-//FAULTY
+// WORKS!!
 // Network topology
 //                           WiFi
 //                            AP
@@ -121,8 +121,6 @@ void simulation(std::string data_rate, std::string tcp_variant ){
     uint32_t maxBytes = 1000*1000*5;
 
 
-
-    Time::SetResolution(Time::NS);
     LogComponentEnableAll(LOG_PREFIX_TIME);
     // LogComponentEnableAll (LOG_PREFIX_FUNC);
     // LogComponentEnable ("ThreeGppHttpClient", LOG_INFO);
@@ -277,7 +275,7 @@ void simulation(std::string data_rate, std::string tcp_variant ){
     
     Ptr<FlowMonitor> fm;
     FlowMonitorHelper fmh;
-    fmh.InstallAll();
+    fm=fmh.InstallAll();
     
 
     AsciiTraceHelper ascii;
@@ -287,16 +285,36 @@ void simulation(std::string data_rate, std::string tcp_variant ){
     // Run simulation
     NS_LOG_INFO("Run Simulation.");
     std::cout<<"crossed"<<std::endl;
-    std::string filename="try1"+data_rate+tcp_variant+".xml";
+    std::ofstream csvFile;
+    csvFile.open("trial1_flow_stats.csv", std::ios::out | std::ios::app);  
     Simulator::Stop(Seconds(10.0));
     
     
     Simulator::Run();
     
-    fm->SerializeToXmlFile(filename,true,true);
+    fm->CheckForLostPackets(); 
+    Ptr<Ipv4FlowClassifier> c = DynamicCast<Ipv4FlowClassifier>(fmh.GetClassifier()); 
+    std::map<FlowId, FlowMonitor::FlowStats> s = fm->GetFlowStats(); 
+
+    for (std::map<FlowId, FlowMonitor::FlowStats>::const_iterator i = s.begin(); i != s.end(); ++i) { 
+        uint32_t flowId = i->first;  // Flow identifier
+        uint32_t txPackets = i->second.txPackets;  // Transmitted packets
+        uint32_t rxPackets = i->second.rxPackets;  // Received packets
+        double throughput = i->second.rxBytes * 8.0 / (10000000.0);  // Throughput in Mbps
+        double meanDelay = i->second.delaySum.GetSeconds() / i->second.rxPackets;  // Mean delay in seconds
+        double packetLoss = (i->second.txPackets - i->second.rxPackets) * 100.0 / i->second.txPackets;  // Packet loss percentage
+    
+        csvFile << tcp_variant<<","<<flowId << "," 
+                << txPackets << "," 
+                << rxPackets << "," 
+                << throughput << "," 
+                << meanDelay << "," 
+                << packetLoss << "\n";
+    }
+    
     
     Simulator::Destroy();
-    
+    csvFile.close();
 
     NS_LOG_INFO("Done.");
 }
@@ -304,7 +322,7 @@ void simulation(std::string data_rate, std::string tcp_variant ){
 int main(){
     std::vector<std::string> tcpvars = {
         "ns3::TcpIllinois",
-        "ns3::TcpWestwood",
+        "ns3::TcpWestwoodPlus",
         "ns3::TcpNewReno",
         "ns3::TcpVegas"
     };
@@ -321,9 +339,10 @@ int main(){
     for(int i=0;i<4;i++){
         for(int j=0;j<8;j++){
             simulation(wifirate[j],tcpvars[i]);
-            std::cout<<("completed an iteration")<<std::endl;
-        }
+            }
     }
+    std::cout<<("completed")<<std::endl;
+
     return 0;
             
 }
