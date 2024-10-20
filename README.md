@@ -12,3 +12,9 @@ File Transfer -> BulkSend ✔️
 Select and Implement Diff. Congestion Control Algos ✔️
 
 Time Series Analysis ✔️
+
+References:-
+
+https://www.nsnam.org/docs/release/3.19/doxygen/tcp-bulk-send_8cc_source.html
+
+https://www.nsnam.org/doxygen/dc/d86/three-gpp-http-example_8cc.html
