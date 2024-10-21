@@ -1,51 +1,31 @@
-import numpy as np
 import pandas as pd
-import json
-from collections import defaultdict
 import matplotlib.pyplot as plt
-import seaborn as sns
-df=pd.read_csv('trial1_flow_stats.csv')
-speeds=[6, 9, 12, 18, 24, 36, 48, 54] * 32
-df['speed']=speeds
-
-tcp_variants = df['tcp_variant'].unique()
-
-# Create a figure with 3 subplots (one for each metric)
-fig, axes = plt.subplots(3, 1, figsize=(10, 18))
-
-# Define colors and markers for better differentiation
-colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
-markers = ['o', 's', '^', 'D', 'x', 'P', '*']
-
-# Plot throughput vs speed for different TCP variants
-for i, tcp in enumerate(tcp_variants):
-    df_variant = df[df['tcp_variant'] == tcp]
-    axes[0].plot(df_variant['speed'], df_variant['throughput'], label=tcp, color=colors[i % len(colors)], marker=markers[i % len(markers)])
-axes[0].set_title('Throughput vs Speed')
-axes[0].set_xlabel('Speed (Mbps)')
-axes[0].set_ylabel('Throughput (Mbps)')
-axes[0].legend(title='TCP Variant')
-
-# Plot meandelay vs speed for different TCP variants
-for i, tcp in enumerate(tcp_variants):
-    df_variant = df[df['tcp_variant'] == tcp]
-    axes[1].plot(df_variant['speed'], df_variant['meandelay'], label=tcp, color=colors[i % len(colors)], marker=markers[i % len(markers)])
-axes[1].set_title('Mean Delay vs Speed')
-axes[1].set_xlabel('Speed (Mbps)')
-axes[1].set_ylabel('Mean Delay (ms)')
-axes[1].legend(title='TCP Variant')
-
-# Plot packetloss vs speed for different TCP variants
-for i, tcp in enumerate(tcp_variants):
-    df_variant = df[df['tcp_variant'] == tcp]
-    axes[2].plot(df_variant['speed'], df_variant['packetloss'], label=tcp, color=colors[i % len(colors)], marker=markers[i % len(markers)])
-axes[2].set_title('Packet Loss vs Speed')
-axes[2].set_xlabel('Speed (Mbps)')
-axes[2].set_ylabel('Packet Loss (%)')
-axes[2].legend(title='TCP Variant')
-
-# Adjust layout for better spacing
-plt.tight_layout()
-
-# Show the plot
+a=pd.read_csv('trial1_flow_stats.csv')
+b=[6,9,12,18,24,36,48,54]*32
+a['speed']=b
+c=a['tcp_variant'].unique()
+d,e=plt.subplots(3,1,figsize=(12,20))
+f=['b','g','r','c','m','y','k']
+g=['o','s','^','D','x','P','*']
+for h,i in enumerate(c):
+    j=a[a['tcp_variant']==i]
+    e[0].plot(j['speed'],j['throughput'],label=i,color=f[h%len(f)],marker=g[h%len(g)])
+    e[0].set_title('Throughput vs Speed')
+    e[0].set_xlabel('Speed (Mbps)')
+    e[0].set_ylabel('Throughput (Mbps)')
+    e[0].legend(title='TCP Variant')
+for h,i in enumerate(c):
+    j=a[a['tcp_variant']==i]
+    e[1].plot(j['speed'],j['meandelay'],label=i,color=f[h%len(f)],marker=g[h%len(g)])
+    e[1].set_title('Mean Delay vs Speed')
+    e[1].set_xlabel('Speed (Mbps)')
+    e[1].set_ylabel('Mean Delay (ms)')
+    e[1].legend(title='TCP Variant')
+for h,i in enumerate(c):
+    j=a[a['tcp_variant']==i]
+    e[2].plot(j['speed'],j['packetloss'],label=i,color=f[h%len(f)],marker=g[h%len(g)])
+    e[2].set_title('Packet Loss vs Speed')
+    e[2].set_xlabel('Speed (Mbps)')
+    e[2].set_ylabel('Packet Loss (%)')
+    e[2].legend(title='TCP Variant')
 plt.show()
