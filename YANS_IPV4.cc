@@ -1,6 +1,45 @@
 #include <algorithm>
 #include <functional>
 
+#include "ns3/applications-module.h"
+#include "ns3/core-module.h"
+#include "ns3/internet-module.h"
+#include "ns3/network-module.h"
+#include "ns3/packet-sink.h"
+#include "ns3/wifi-module.h"
+#include "ns3/mobility-module.h"
+#include "ns3/netanim-module.h"
+#include "ns3/point-to-point-module.h"
+#include <fstream>
+#include <string>
+
+
+#include "ns3/attribute-container.h"
+#include "ns3/boolean.h"
+#include "ns3/command-line.h"
+#include "ns3/config.h"
+#include "ns3/double.h"
+#include "ns3/enum.h"
+#include "ns3/he-phy.h"
+#include "ns3/internet-stack-helper.h"
+#include "ns3/ipv4-address-helper.h"
+#include "ns3/ipv4-global-routing-helper.h"
+#include "ns3/log.h"
+#include "ns3/mobility-helper.h"
+#include "ns3/multi-model-spectrum-channel.h"
+#include "ns3/on-off-helper.h"
+#include "ns3/packet-sink-helper.h"
+#include "ns3/packet-sink.h"
+#include "ns3/spectrum-wifi-helper.h"
+#include "ns3/ssid.h"
+#include "ns3/string.h"
+#include "ns3/udp-client-server-helper.h"
+#include "ns3/udp-server.h"
+#include "ns3/uinteger.h"
+#include "ns3/wifi-acknowledgment.h"
+#include "ns3/yans-wifi-channel.h"
+#include "ns3/yans-wifi-helper.h"
+
 using namespace ns3;
 NS_LOG_COMPONENT_DEFINE("WN_Assign-3");
 
