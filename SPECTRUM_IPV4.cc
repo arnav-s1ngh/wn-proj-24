@@ -44,7 +44,7 @@ using namespace ns3;
 NS_LOG_COMPONENT_DEFINE("WN_Assign-3");
 
 void simulation(int zis, std::string tcp_variant) {
-    int nw=20; // Number of STAs in the WiFi network
+    int nw=15; // Number of STAs in the WiFi network
     NodeContainer sta_nodes;
     sta_nodes.Create(nw);
     
@@ -122,7 +122,7 @@ void simulation(int zis, std::string tcp_variant) {
     
     int bs_port=9;
     
-    for (int i=0; i < 20; i++) {
+    for (int i=0; i < 15; i++) {
         BulkSendHelper source("ns3::TcpSocketFactory",InetSocketAddress(sta_interface.GetAddress(i),bs_port));
         source.SetAttribute("MaxBytes",UintegerValue(zis * 1024 * 1024));
         ApplicationContainer sourceApps=source.Install(ap_node.Get(0));
