@@ -1,5 +1,5 @@
 # wn-proj-24
-The Project for CSE5235: Wireless Networks, as taught by Mukulika Maity at IIIT Delhi in Monsoon 2024
+Course Project for CSE5235: Wireless Networks, as taught by Mukulika Maity at IIIT Delhi in Monsoon 2024
 
 Models Tested: Illinois , WestwoodPlus, NewReno, Vegas, Cubic
 
@@ -18,3 +18,8 @@ References:-
 https://www.nsnam.org/docs/release/3.19/doxygen/tcp-bulk-send_8cc_source.html
 
 https://www.nsnam.org/doxygen/dc/d86/three-gpp-http-example_8cc.html
+
+
+Baseline Model:-
+
+YANS+IPV4+Bulksend
