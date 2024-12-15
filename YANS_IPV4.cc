@@ -127,8 +127,8 @@ void simulation(int zis, std::string tcp_variant) {
         bs_port+=1;
     }
     Ipv4GlobalRoutingHelper::PopulateRoutingTables(); 
-    p2pconn.EnablePcapAll(tcp_variant+"_"+zis+"_wired_capture",false);
-    phy.EnablePcapAll(tcp_variant+"_"+zis+"_wireless_capture",false);
+    p2pconn.EnablePcapAll(tcp_variant+"_wired_capture_yansipv4",false);
+    phy.EnablePcapAll(tcp_variant+"_wireless_capture_yansipv4",false);
     
     Simulator::Stop(Seconds(10.0));
     Simulator::Run();
@@ -145,9 +145,8 @@ int main(){
         "ns3::TcpCubic"
     };
    for(int i=0;i<5;i++){
+        std::cout<<tcpvars[i]<<std::endl;
         for(int j=0;j<7;j++){
-        
-            std::cout<<tcpvars[i], datasizes[j]<<std::endl;
             simulation(datasizes[j],tcpvars[i]);
             }
         }
