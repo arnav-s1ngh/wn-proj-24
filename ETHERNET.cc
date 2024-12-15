@@ -41,6 +41,8 @@
 #include "ns3/yans-wifi-channel.h"
 #include "ns3/yans-wifi-helper.h"
 
+#include "ns3/flow-monitor-module.h"
+
 using namespace ns3;
 NS_LOG_COMPONENT_DEFINE("WN_Assign-3");
 
@@ -82,12 +84,37 @@ void simulation(int zis, std::string tcp_variant) {
         sinkApps.Stop(Seconds(10.0));
         bs_port += 1;
     }
+    
+    Ptr<FlowMonitor> fm;
+    FlowMonitorHelper fmh;
+    fm=fmh.InstallAll();
 
     Ipv4GlobalRoutingHelper::PopulateRoutingTables();
     csma.EnablePcapAll(tcp_variant + "_csma_capture", false);
+    
+    std::ofstream csvFile;
+    csvFile.open("z_csma_flow_stats.csv", std::ios::out | std::ios::app);
 
     Simulator::Stop(Seconds(10.0));
     Simulator::Run();
+    fm->CheckForLostPackets(); 
+    Ptr<Ipv4FlowClassifier> c = DynamicCast<Ipv4FlowClassifier>(fmh.GetClassifier()); 
+    std::map<FlowId, FlowMonitor::FlowStats> s = fm->GetFlowStats(); 
+    for (std::map<FlowId, FlowMonitor::FlowStats>::const_iterator i = s.begin(); i != s.end(); ++i) { 
+        uint32_t flowId = i->first;  // Flow identifier
+        uint32_t txPackets = i->second.txPackets;  // Transmitted packets
+        uint32_t rxPackets = i->second.rxPackets;  // Received packets
+        double throughput = i->second.rxBytes * 8.0 / (10000000.0);  // Throughput in Mbps
+        double meanDelay = i->second.delaySum.GetSeconds() / i->second.rxPackets;  // Mean delay in seconds
+        double packetLoss = (i->second.txPackets - i->second.rxPackets) * 100.0 / i->second.txPackets;  // Packet loss percentage
+    
+        csvFile << tcp_variant<<","<<zis<<","<<flowId << "," 
+                << txPackets << "," 
+                << rxPackets << "," 
+                << throughput << "," 
+                << meanDelay << "," 
+                << packetLoss << "\n";
+    }
     Simulator::Destroy();
 }
 
